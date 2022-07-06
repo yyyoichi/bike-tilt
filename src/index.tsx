@@ -3,6 +3,7 @@ import { render } from 'solid-js/web';
 import { FirebaseProvider } from 'solid-firebase'
 import './index.css';
 import App from './App';
+import { Router } from 'solid-app-router';
 const {
     REACT_APP_APP_KEY,
     REACT_APP_AUTH_DOMAIN,
@@ -26,7 +27,9 @@ const firebaseConfig = {
 render(
     () => (
         <FirebaseProvider config={firebaseConfig}>
-            <App />
+            <Router>
+                <App />
+            </Router>
         </FirebaseProvider>
     ),
     document.getElementById('root') as HTMLElement,
