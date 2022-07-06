@@ -3,18 +3,26 @@ import { render } from 'solid-js/web';
 import { FirebaseProvider } from 'solid-firebase'
 import './index.css';
 import App from './App';
-
+const {
+    REACT_APP_APP_KEY,
+    REACT_APP_AUTH_DOMAIN,
+    // REACT_APP_DATABASE_URL,
+    REACT_APP_PROJECT_ID,
+    REACT_APP_STORAGEBUCKET,
+    REACT_APP_MESSAGING_SENDER_ID,
+    REACT_APP_APP_ID,
+    REACT_APP_MEASUREMENT_ID,
+} = import.meta.env
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_APP_KEY,
-    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-    // databaseURL: process.env.REACT_APP_DATABASE_URL,
-    projectId: process.env.REACT_APP_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_STORAGEBUCKET,
-    messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
-    appId: process.env.REACT_APP_APP_ID,
-    measurementId: process.env.REACT_APP_MEASUREMENT_ID,
+    apiKey: REACT_APP_APP_KEY,
+    authDomain: REACT_APP_AUTH_DOMAIN,
+    // databaseURL: REACT_APP_DATABASE_URL,
+    projectId: REACT_APP_PROJECT_ID,
+    storageBucket: REACT_APP_STORAGEBUCKET,
+    messagingSenderId: REACT_APP_MESSAGING_SENDER_ID,
+    appId: REACT_APP_APP_ID,
+    measurementId: REACT_APP_MEASUREMENT_ID,
 }
-
 render(
     () => (
         <FirebaseProvider config={firebaseConfig}>
