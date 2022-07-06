@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "firebase": "^9.8.4",
+    "solid-app-router": "^0.4.1",
     "solid-firebase": "^0.1.4",
     "solid-js": "^1.4.2"
   }
