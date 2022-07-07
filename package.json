@@ -7,7 +7,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "serve": "vite preview",
-    "preview": "vite build && firebase hosting:channel:deploy ${npm_config_n}",
+    "preview": "vite build && firebase hosting:channel:deploy $npm_config_n",
     "deploy": "vite build && firebase deploy"
   },
   "license": "MIT",
