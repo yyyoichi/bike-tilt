@@ -1,29 +1,63 @@
-import { createSignal } from "solid-js"
-
+import { createEffect, createSignal } from "solid-js"
+type Orientation = {
+    "alpha": number,
+    "beta": number,
+    "gamma": number,
+}
+type UseOrientationStates = {
+    isEnable: boolean,
+    message: string
+}
 export default function Play() {
-    const [isEnable, setEnable] = createSignal(false)
-    const [motion, setMotion] = createSignal("no")
-    // DeviceOrientationEvent.prototype.
-    const iosPermission = async () => {
-        if (typeof( DeviceMotionEvent ) !== "undefined" && typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+    const [useOrientationStates, setUseOrientationStates] = createSignal<UseOrientationStates>({
+        isEnable: false,
+        message: ""
+    })
+    const [orientation, setOrientation] = createSignal<Orientation>({
+        "alpha": 0,
+        "beta": 0,
+        "gamma": 0
+    })
+    const permitOrientation = async () => {
+        if (typeof (DeviceMotionEvent) !== "undefined" && typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
             const res = await (DeviceOrientationEvent as any).requestPermission()
             if (res !== "granted") {
-                return setMotion("You can not use.")
+                return setUseOrientationStates(p => {
+                    return {
+                        ...p,
+                        "message": "検知を許可してください"
+                    }
+                })
             }
         }
-        window.addEventListener("deviceorientation", event => {
-            console.log(event)
-            setMotion(JSON.stringify(event["beta"]))
+        /**
+         * 傾き検知時に起動
+         */
+        window.addEventListener("deviceorientation", ({
+            alpha,
+            beta,
+            gamma
+        }) => {
+            setOrientation({
+                alpha: alpha || 0,
+                beta: beta || 0,
+                gamma: gamma || 0
+            })
         }, true)
-        setEnable(true)
+        setUseOrientationStates((p) => {
+            return {...p, isEnable: true}
+        })
     }
+    createEffect(() => {
+        console.log("calc!")
+    })
 
     return (
-        <div style={{ backgroundColor: "#666" }}>
+        <div>
             <div>play!</div>
-            <p>{motion()}</p>
+            <div>{JSON.stringify(orientation())}</div>
             {
-                isEnable()? <></>: <input type="submit" value={"start"} onclick={iosPermission}/>
+                useOrientationStates()["isEnable"] ? <></> : <input type="submit" value={"start"} onclick={permitOrientation} />
             }
         </div>
     )
