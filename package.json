@@ -6,7 +6,9 @@
     "start": "vite",
     "dev": "vite --host",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "preview": "vite build && firebase hosting:channel:deploy ${npn_config_n}",
+    "deploy": "vite build && firebase deploy"
   },
   "license": "MIT",
   "devDependencies": {
