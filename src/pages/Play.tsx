@@ -33,19 +33,14 @@ export default function Play() {
         /**
          * 傾き検知時に起動
          */
-        window.addEventListener("deviceorientation", ({
-            alpha,
-            beta,
-            gamma
-        }) => {
-            setOrientation({
-                alpha: alpha || 0,
-                beta: beta || 0,
-                gamma: gamma || 0
-            })
+        window.addEventListener("deviceorientation", (event) => {
+            const alpha = Math.round(event["alpha"] ? event["alpha"] * 10 : 10) / 10
+            const beta = Math.round(event["beta"] ? event["beta"] * 10 : 10) / 10
+            const gamma = Math.round(event["gamma"] ? event["gamma"] * 10 : 10) / 10
+            setOrientation({ alpha, beta, gamma })
         }, true)
         setUseOrientationStates((p) => {
-            return {...p, isEnable: true}
+            return { ...p, isEnable: true }
         })
     }
     createEffect(() => {
@@ -53,10 +48,13 @@ export default function Play() {
     })
 
     return (
-        <div>
+        <div style={{fontSize: "50px"}}>
             <div>play!</div>
-            <div>{JSON.stringify(orientation())}</div>
+            <div>a: {orientation().alpha}</div>
+            <div>b: {orientation().beta}</div>
+            <div>g: {orientation().gamma}</div>
             {
+
                 useOrientationStates()["isEnable"] ? <></> : <input type="submit" value={"start"} onclick={permitOrientation} />
             }
         </div>
