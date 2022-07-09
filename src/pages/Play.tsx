@@ -18,6 +18,12 @@ export default function Play() {
         "beta": 0,
         "gamma": 0
     })
+    const eventLister = (event: DeviceOrientationEvent) => {
+        const alpha = Math.round(event["alpha"] ? event["alpha"] * 10 : 10) / 10
+        const beta = Math.round(event["beta"] ? event["beta"] * 10 : 10) / 10
+        const gamma = Math.round(event["gamma"] ? event["gamma"] * 10 : 10) / 10
+        setOrientation({ alpha, beta, gamma })
+    }
     const permitOrientation = async () => {
         if (typeof (DeviceMotionEvent) !== "undefined" && typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
             const res = await (DeviceOrientationEvent as any).requestPermission()
@@ -33,14 +39,15 @@ export default function Play() {
         /**
          * 傾き検知時に起動
          */
-        window.addEventListener("deviceorientation", (event) => {
-            const alpha = Math.round(event["alpha"] ? event["alpha"] * 10 : 10) / 10
-            const beta = Math.round(event["beta"] ? event["beta"] * 10 : 10) / 10
-            const gamma = Math.round(event["gamma"] ? event["gamma"] * 10 : 10) / 10
-            setOrientation({ alpha, beta, gamma })
-        }, true)
+        window.addEventListener("deviceorientation", eventLister, true)
         setUseOrientationStates((p) => {
             return { ...p, isEnable: true }
+        })
+    }
+    const closeOrientation = () => {
+        window.removeEventListener("deviceorientation", eventLister, true)
+        setUseOrientationStates((p) => {
+            return { ...p, isEnable: false }
         })
     }
     createEffect(() => {
@@ -48,14 +55,19 @@ export default function Play() {
     })
 
     return (
-        <div style={{fontSize: "50px"}}>
+        <div style={{ fontSize: "50px" }}>
             <div>play!</div>
             <div>a: {orientation().alpha}</div>
             <div>b: {orientation().beta}</div>
             <div>g: {orientation().gamma}</div>
             {
-
-                useOrientationStates()["isEnable"] ? <></> : <input type="submit" value={"start"} onclick={permitOrientation} />
+                useOrientationStates()["isEnable"] ? <input
+                    type="submit"
+                    value="end"
+                    onClick={closeOrientation} /> : <input
+                    type="submit"
+                    value={"start"}
+                    onclick={permitOrientation} />
             }
         </div>
     )
