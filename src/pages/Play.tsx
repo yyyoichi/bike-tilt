@@ -25,7 +25,7 @@ export default function Play() {
         setOrientation({ alpha, beta, gamma })
     }
     const permitOrientation = async () => {
-        if (typeof (DeviceMotionEvent) !== "undefined" && typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+        if (typeof (DeviceOrientationEvent) !== "undefined" && typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
             const res = await (DeviceOrientationEvent as any).requestPermission()
             if (res !== "granted") {
                 return setUseOrientationStates(p => {
