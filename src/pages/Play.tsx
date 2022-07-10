@@ -19,6 +19,11 @@ export default function Play() {
         "beta": 0,
         "gamma": 0
     })
+    const [initOrt, setInitOrt] = createSignal<Orientation>({
+        "alpha": 0,
+        "beta": 0,
+        "gamma": 0
+    })
     const eventLister = (e: DeviceOrientationEvent) => {
         setOrientation((_) => {
             const alpha = e.alpha || 0
@@ -76,7 +81,7 @@ export default function Play() {
         console.log(qt)
         const r = base.angleTo(qt)
         console.log(r)
-        console.log(10/Math.PI * r + "度")
+        console.log(10 / Math.PI * r + "度")
     })
 
     return (
