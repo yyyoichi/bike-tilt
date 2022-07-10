@@ -18,11 +18,21 @@ export default function Play() {
         "beta": 0,
         "gamma": 0
     })
-    const eventLister = (event: DeviceOrientationEvent) => {
-        const alpha = Math.round(event["alpha"] ? event["alpha"] * 10 : 10) / 10
-        const beta = Math.round(event["beta"] ? event["beta"] * 10 : 10) / 10
-        const gamma = Math.round(event["gamma"] ? event["gamma"] * 10 : 10) / 10
-        setOrientation({ alpha, beta, gamma })
+    const eventLister = (e: DeviceOrientationEvent) => {
+        setOrientation((_) => {
+            const alpha = e.alpha || 0
+            const beta = e.beta || 0
+            const gamma = e.gamma || 0
+            return { alpha, beta, gamma }
+        })
+    }
+    const debag = () => {
+        const alpha = Math.round(orientation()["alpha"] * 10 ) / 10
+        const beta = Math.round(orientation()["beta"] * 10 ) / 10
+        const gamma = Math.round(orientation()["gamma"] * 10) / 10
+        return {
+            alpha, beta, gamma
+        }
     }
     const permitOrientation = async () => {
         if (typeof (DeviceOrientationEvent) !== "undefined" && typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
@@ -57,9 +67,9 @@ export default function Play() {
     return (
         <div style={{ fontSize: "50px" }}>
             <div>play!</div>
-            <div>a: {orientation().alpha}</div>
-            <div>b: {orientation().beta}</div>
-            <div>g: {orientation().gamma}</div>
+            <div>a: {debag().alpha}</div>
+            <div>b: {debag().beta}</div>
+            <div>g: {debag().gamma}</div>
             {
                 useOrientationStates()["isEnable"] ? <input
                     type="submit"
