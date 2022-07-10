@@ -1,4 +1,5 @@
 import { createEffect, createSignal } from "solid-js"
+import * as THREE from "three"
 type Orientation = {
     "alpha": number,
     "beta": number,
@@ -27,8 +28,8 @@ export default function Play() {
         })
     }
     const debag = () => {
-        const alpha = Math.round(orientation()["alpha"] * 10 ) / 10
-        const beta = Math.round(orientation()["beta"] * 10 ) / 10
+        const alpha = Math.round(orientation()["alpha"] * 10) / 10
+        const beta = Math.round(orientation()["beta"] * 10) / 10
         const gamma = Math.round(orientation()["gamma"] * 10) / 10
         return {
             alpha, beta, gamma
@@ -62,6 +63,20 @@ export default function Play() {
     }
     createEffect(() => {
         console.log("calc!")
+        const qt = new THREE.Quaternion()
+        const beta = THREE.MathUtils.degToRad(orientation().beta)
+        const alpha = THREE.MathUtils.degToRad(orientation().alpha)
+        const gamma = THREE.MathUtils.degToRad(-orientation().gamma)
+        const euler = new THREE.Euler()
+        euler.set(beta, gamma, alpha, "ZXY")
+        qt.setFromEuler(euler)
+
+        const base = new THREE.Quaternion()
+        base.setFromAxisAngle(new THREE.Vector3(qt.x, 0, qt.z), qt.w)
+        console.log(qt)
+        const r = base.angleTo(qt)
+        console.log(r)
+        console.log(10/Math.PI * r + "度")
     })
 
     return (
