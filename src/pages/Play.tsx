@@ -1,9 +1,9 @@
 import { createEffect, createSignal } from "solid-js"
 import * as THREE from "three"
-type Orientation = {
-    "alpha": number,
-    "beta": number,
-    "gamma": number,
+type Acceleration = {
+    "x": number,
+    "y": number,
+    "z": number,
 }
 type UseOrientationStates = {
     isEnable: boolean,
@@ -14,35 +14,40 @@ export default function Play() {
         isEnable: false,
         message: ""
     })
-    const [orientation, setOrientation] = createSignal<Orientation>({
-        "alpha": 0,
-        "beta": 0,
-        "gamma": 0
+    const [acceleration, setAcceleration] = createSignal<Acceleration>({
+        "x": 0,
+        "y": 0,
+        "z": 0
     })
-    const [initOrt, setInitOrt] = createSignal<Orientation>({
-        "alpha": 0,
-        "beta": 0,
-        "gamma": 0
+    const [initAcl, setInitAcl] = createSignal<Acceleration>({
+        "x": 0,
+        "y": 0,
+        "z": 0
     })
-    const eventLister = (e: DeviceOrientationEvent) => {
-        setOrientation((_) => {
-            const alpha = e.alpha || 0
-            const beta = e.beta || 0
-            const gamma = e.gamma || 0
-            return { alpha, beta, gamma }
+    const eventLister = (e: DeviceMotionEvent) => {
+        const {accelerationIncludingGravity: acl} = e
+        setAcceleration((_) => {
+            const x = acl?.x || 0
+            const y = acl?.y || 0
+            const z = acl?.z || 0
+            return { x, y, z }
         })
     }
     const debag = () => {
-        const alpha = Math.round(orientation()["alpha"] * 10) / 10
-        const beta = Math.round(orientation()["beta"] * 10) / 10
-        const gamma = Math.round(orientation()["gamma"] * 10) / 10
+        const x = acceleration().x
+        const y = acceleration().y
+        const z = acceleration().z
+        const g = Math.sqrt(x*x + y*y + z*z)
+        const theta = 180/Math.PI*Math.acos(-z/g)
+
+        
         return {
-            alpha, beta, gamma
+            x, y, z, theta
         }
     }
     const permitOrientation = async () => {
-        if (typeof (DeviceOrientationEvent) !== "undefined" && typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-            const res = await (DeviceOrientationEvent as any).requestPermission()
+        if (typeof (DeviceMotionEvent) !== "undefined" && typeof (DeviceMotionEvent as any).requestPermission === 'function') {
+            const res = await (DeviceMotionEvent as any).requestPermission()
             if (res !== "granted") {
                 return setUseOrientationStates(p => {
                     return {
@@ -55,41 +60,28 @@ export default function Play() {
         /**
          * 傾き検知時に起動
          */
-        window.addEventListener("deviceorientation", eventLister, true)
+        window.addEventListener("devicemotion", eventLister, true)
         setUseOrientationStates((p) => {
             return { ...p, isEnable: true }
         })
     }
     const closeOrientation = () => {
-        window.removeEventListener("deviceorientation", eventLister, true)
+        window.removeEventListener("devicemotion", eventLister, true)
         setUseOrientationStates((p) => {
             return { ...p, isEnable: false }
         })
     }
     createEffect(() => {
         console.log("calc!")
-        const qt = new THREE.Quaternion()
-        const beta = THREE.MathUtils.degToRad(orientation().beta)
-        const alpha = THREE.MathUtils.degToRad(orientation().alpha)
-        const gamma = THREE.MathUtils.degToRad(-orientation().gamma)
-        const euler = new THREE.Euler()
-        euler.set(beta, gamma, alpha, "ZXY")
-        qt.setFromEuler(euler)
-
-        const base = new THREE.Quaternion()
-        base.setFromAxisAngle(new THREE.Vector3(qt.x, 0, qt.z), qt.w)
-        console.log(qt)
-        const r = base.angleTo(qt)
-        console.log(r)
-        console.log(10 / Math.PI * r + "度")
     })
 
     return (
         <div style={{ fontSize: "50px" }}>
             <div>play!</div>
-            <div>a: {debag().alpha}</div>
-            <div>b: {debag().beta}</div>
-            <div>g: {debag().gamma}</div>
+            <div>x: {debag().x}</div>
+            <div>y: {debag().y}</div>
+            <div>z: {debag().z}</div>
+            <div>theta: {debag().theta}</div>
             {
                 useOrientationStates()["isEnable"] ? <input
                     type="submit"
