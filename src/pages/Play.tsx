@@ -14,6 +14,11 @@ export default function Play() {
         isEnable: false,
         message: ""
     })
+    const [aclInGrb, setAclIngrb] = createSignal<Acceleration>({
+        "x": 0,
+        "y": 0,
+        "z": 0
+    })
     const [acceleration, setAcceleration] = createSignal<Acceleration>({
         "x": 0,
         "y": 0,
@@ -25,7 +30,14 @@ export default function Play() {
         "z": 0
     })
     const eventLister = (e: DeviceMotionEvent) => {
-        const {accelerationIncludingGravity: acl} = e
+        const { accelerationIncludingGravity: aclInG } = e
+        setAclIngrb((_) => {
+            const x = aclInG?.x || 0
+            const y = aclInG?.y || 0
+            const z = aclInG?.z || 0
+            return { x, y, z }
+        })
+        const { acceleration: acl } = e
         setAcceleration((_) => {
             const x = acl?.x || 0
             const y = acl?.y || 0
@@ -34,15 +46,21 @@ export default function Play() {
         })
     }
     const debag = () => {
+        const gx = aclInGrb().x
+        const gy = aclInGrb().y
+        const gz = aclInGrb().z
+        const gg = Math.sqrt(gx * gx + gy * gy + gz * gz)
+        const gtheta = 180 / Math.PI * Math.acos(-gz / gg)
+
         const x = acceleration().x
         const y = acceleration().y
         const z = acceleration().z
-        const g = Math.sqrt(x*x + y*y + z*z)
-        const theta = 180/Math.PI*Math.acos(-z/g)
+        const g = Math.sqrt(x * x + y * y + z * z)
+        const theta = 180 / Math.PI * Math.acos(-z / g)
 
-        
+
         return {
-            x, y, z, theta
+            x, y, z, theta, gx, gy, gz, gtheta
         }
     }
     const permitOrientation = async () => {
@@ -78,10 +96,17 @@ export default function Play() {
     return (
         <div style={{ fontSize: "50px" }}>
             <div>play!</div>
+            <div>重力加速度含まない加速度</div>
             <div>x: {debag().x}</div>
             <div>y: {debag().y}</div>
             <div>z: {debag().z}</div>
             <div>theta: {debag().theta}</div>
+            <p></p>
+            <div>重力加速度</div>
+            <div>x: {debag().gx}</div>
+            <div>y: {debag().gy}</div>
+            <div>z: {debag().gz}</div>
+            <div>theta: {debag().gtheta}</div>
             {
                 useOrientationStates()["isEnable"] ? <input
                     type="submit"
